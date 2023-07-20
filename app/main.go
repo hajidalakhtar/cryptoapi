@@ -23,7 +23,7 @@ func main() {
 	timeoutContext := time.Duration(2) * time.Second
 
 	app := fiber.New(fiber.Config{
-		Prefork:       true,
+		Prefork:       false,
 		CaseSensitive: true,
 		StrictRouting: true,
 		ServerHeader:  "Fiber",
