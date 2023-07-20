@@ -7,8 +7,8 @@ import (
 )
 
 type Wallet struct {
-	Address string    `json:"addr"`
-	Balance []Balance `json:"balance"`
+	Address string     `json:"addr"`
+	Balance []Balances `json:"balance"`
 }
 
 type NewWallet struct {
@@ -17,7 +17,7 @@ type NewWallet struct {
 	Mnemonic string `json:"mnemonic"`
 }
 
-type Balance struct {
+type Balances struct {
 	Name   string     `json:"name"`
 	Amount *big.Float `json:"amount"`
 }
@@ -29,8 +29,8 @@ type WalletUsecase interface {
 	Transfer(context.Context, string, string, int, int, uint64) (string, error)
 }
 type WalletRepository interface {
-	GetBalance(context.Context, string) ([]Balance, error)
+	GetBalance(context.Context, string) ([]Balances, error)
 	GenerateNewWallet(context.Context) (string, string, error)
-	GetBalanceFromMnemonic(context.Context, string) ([]Balance, string, error)
+	GetBalanceFromMnemonic(context.Context, string) ([]Balances, string, error)
 	Transfer(context.Context, string, common.Address, *big.Int, *big.Int, uint64) (string, error)
 }

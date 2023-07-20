@@ -23,7 +23,7 @@ func NewWalletRepository(client *ethclient.Client) domain.WalletRepository {
 	return &RPCWalletRepository{client: client}
 }
 
-func (r *RPCWalletRepository) GetBalanceFromMnemonic(ctx context.Context, mnemonic string) ([]domain.Balance, string, error) {
+func (r *RPCWalletRepository) GetBalanceFromMnemonic(ctx context.Context, mnemonic string) ([]domain.Balances, string, error) {
 	wallet, err := hdwallet.NewFromMnemonic(mnemonic)
 	if err != nil {
 		log.Fatal(err)
@@ -63,7 +63,7 @@ func (r *RPCWalletRepository) GenerateNewWallet(ctx context.Context) (string, st
 	return account.Address.Hex(), mnemonic, nil
 }
 
-func (r *RPCWalletRepository) GetBalance(ctx context.Context, addr string) ([]domain.Balance, error) {
+func (r *RPCWalletRepository) GetBalance(ctx context.Context, addr string) ([]domain.Balances, error) {
 	address := common.HexToAddress(addr)
 
 	balance, err := r.client.BalanceAt(context.Background(), address, nil)
@@ -73,7 +73,7 @@ func (r *RPCWalletRepository) GetBalance(ctx context.Context, addr string) ([]do
 
 	nativeTokenBalance := utils.ConvertBalanceToFloat(balance, 18)
 
-	balanceResp := []domain.Balance{{Name: "BNB", Amount: nativeTokenBalance}}
+	balanceResp := []domain.Balances{{Name: "BNB", Amount: nativeTokenBalance}}
 
 	tokenSymbols := map[string]string{
 		//"CAKE":         "0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82",
@@ -176,7 +176,7 @@ func (r *RPCWalletRepository) GetBalance(ctx context.Context, addr string) ([]do
 		//"YAY":          "0x524dF384BFFB18C0C8f3f43d012011F8F9795579",
 		//"ZIN":          "0xFbe0b4aE6E5a200c36A341299604D5f71A5F0a48",
 	}
-	balanceChan := make(chan domain.Balance, len(tokenSymbols))
+	balanceChan := make(chan domain.Balances, len(tokenSymbols))
 	var wg sync.WaitGroup
 
 	for symbol, tokenAddr := range tokenSymbols {
@@ -190,7 +190,7 @@ func (r *RPCWalletRepository) GetBalance(ctx context.Context, addr string) ([]do
 				return
 			}
 
-			balanceChan <- domain.Balance{Name: symbol, Amount: tokenBalance}
+			balanceChan <- domain.Balances{Name: symbol, Amount: tokenBalance}
 		}(symbol, tokenAddr)
 	}
 
