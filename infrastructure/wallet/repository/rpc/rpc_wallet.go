@@ -3,8 +3,8 @@ package rpc
 import (
 	"context"
 	"cryptoapi/domain"
-	utils "cryptoapi/helper"
-	"cryptoapi/infrastructure/wallet/repository/helper"
+	"cryptoapi/helper"
+
 	"log"
 	"math/big"
 	"sync"
@@ -71,27 +71,28 @@ func (r *RPCWalletRepository) GetBalance(ctx context.Context, addr string) ([]do
 		return nil, err
 	}
 
-	nativeTokenBalance := utils.ConvertBalanceToFloat(balance, 18)
+	nativeTokenBalance := helper.ConvertBalanceToFloat(balance, 18)
 
 	balanceResp := []domain.Balances{{Name: "BNB", Amount: nativeTokenBalance}}
 
 	tokenSymbols := map[string]string{
-		//"CAKE":         "0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82",
-		//"ETH":          "0xA72Ff2B799324B042AE379809eE54dACE99db3A5",
-		//"ADA":          "0x3EE2200Efb3400fAbB9AacF31297cBdD1d435D47",
-		//"ALICE":        "0xAC51066d7bEC65Dc4589368da368b212745d63E8",
-		//"ALIX":         "0xaF6Bd11A6F8f9c44b9D18f5FA116E403db599f8E",
-		//"ALPHA":        "0xa1faa113cbE53436Df28FF0aEe54275c13B40975",
-		//"ALU":          "0x8263CD1601FE73C066bf49cc09841f35348e3be0",
-		//"ATA":          "0xA2120b9e674d3fC3875f415A7DF52e382F141225",
-		//"ATOM":         "0x0Eb3a705fc54725037CC9e008bDede697f62F335",
-		//"AXS":          "0x715D400F88C167884bbCc41C5FeA407ed4D2f8A0",
-		//"BABYDOGE":     "0xc748673057861a797275CD8A068AbB95A902e8de",
-		//"BEAR":         "0xc3EAE9b061Aa0e1B9BD3436080Dc57D2d63FEdc1",
-		//"BEL":          "0x8443f091997f06a61670B735ED92734F5628692F",
-		//"BELT":         "0xE0e514c71282b6f4e823703a39374Cf58dc3eA4f",
-		//"BIN":          "0xe56842Ed550Ff2794F010738554db45E60730371",
-		//"BMON":         "0x08ba0619b1e7A582E0BCe5BBE9843322C954C340",
+		"CAKE": "0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82",
+
+		"ETH":      "0xA72Ff2B799324B042AE379809eE54dACE99db3A5",
+		"ADA":      "0x3EE2200Efb3400fAbB9AacF31297cBdD1d435D47",
+		"ALICE":    "0xAC51066d7bEC65Dc4589368da368b212745d63E8",
+		"ALIX":     "0xaF6Bd11A6F8f9c44b9D18f5FA116E403db599f8E",
+		"ALPHA":    "0xa1faa113cbE53436Df28FF0aEe54275c13B40975",
+		"ALU":      "0x8263CD1601FE73C066bf49cc09841f35348e3be0",
+		"ATA":      "0xA2120b9e674d3fC3875f415A7DF52e382F141225",
+		"ATOM":     "0x0Eb3a705fc54725037CC9e008bDede697f62F335",
+		"AXS":      "0x715D400F88C167884bbCc41C5FeA407ed4D2f8A0",
+		"BABYDOGE": "0xc748673057861a797275CD8A068AbB95A902e8de",
+		"BEAR":     "0xc3EAE9b061Aa0e1B9BD3436080Dc57D2d63FEdc1",
+		"BEL":      "0x8443f091997f06a61670B735ED92734F5628692F",
+		"BELT":     "0xE0e514c71282b6f4e823703a39374Cf58dc3eA4f",
+		"BIN":      "0xe56842Ed550Ff2794F010738554db45E60730371",
+		"BMON":     "0x08ba0619b1e7A582E0BCe5BBE9843322C954C340",
 		//"BNX":          "0x8C851d1a123Ff703BD1f9dabe631b69902Df5f97",
 		//"BP":           "0xACB8f52DC63BB752a51186D1c55868ADbFfEe9C1",
 		//"BSCPAD":       "0x5A3010d4d8D3B5fB49f8B6E57FB9E48063f16700",

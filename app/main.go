@@ -19,7 +19,6 @@ import (
 )
 
 func main() {
-
 	timeoutContext := time.Duration(2) * time.Second
 
 	app := fiber.New(fiber.Config{
@@ -31,17 +30,15 @@ func main() {
 		BodyLimit:     2097152,
 	})
 
-	client, err := ethclient.Dial("https://data-seed-prebsc-1-s2.bnbchain.org:8545")
-	bscscanApi := "https://api.bscscan.com/api"
+	client, err := ethclient.Dial("https://bsc.publicnode.com")
+
 	defer client.Close()
 
-	if err != nil {
-		log.Fatalf("Failed to connect to the Binance Smart Chain client: %v", err)
-	}
-	defer client.Close()
+	bscscanApi := "https://api.bscscan.com/api"
 
 	// Init Repository
 	wr := walletRepo.NewWalletRepository(client)
+
 	apitr := apiTrRepo.NewAPITransactionRepository(bscscanApi)
 	rpctr := rpcTrRepo.NewRPCTransactionRepository(client)
 

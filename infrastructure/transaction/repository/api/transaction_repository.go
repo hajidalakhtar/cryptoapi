@@ -3,7 +3,7 @@ package rpc
 import (
 	"context"
 	"cryptoapi/domain"
-	"cryptoapi/infrastructure/transaction/repository/helper"
+	"cryptoapi/helper"
 	"encoding/json"
 	"fmt"
 	"net/http"
