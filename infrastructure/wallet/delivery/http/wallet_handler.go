@@ -4,6 +4,7 @@ import (
 	"cryptoapi/domain"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -41,7 +42,10 @@ func (wh *WalletHandler) GetBalanceFromMnemonic(c *fiber.Ctx) error {
 
 func (wh *WalletHandler) GetBalance(c *fiber.Ctx) error {
 	addr := c.Params("addr")
-	data, err := wh.walletUsecase.GetBalance(c.Context(), addr)
+	tokenAddr := c.Query("token")
+	tokenAddrArr := strings.Split(tokenAddr, ",")
+
+	data, err := wh.walletUsecase.GetBalance(c.Context(), tokenAddrArr, addr)
 
 	if err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(domain.WebResponse{

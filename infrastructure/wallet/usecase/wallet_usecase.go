@@ -3,20 +3,25 @@ package usecase
 import (
 	"context"
 	"cryptoapi/domain"
+	"log"
 	"math/big"
+	"strconv"
+	"sync"
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
 )
 
 type WalletUsecase struct {
-	walletRepo     domain.WalletRepository
+	rpcWalletRepo  domain.RPCWalletRepository
+	supaWalletRepo domain.SupabaseWalletRepository
 	contextTimeout time.Duration
 }
 
-func NewWalletUsecase(wr domain.WalletRepository, timeout time.Duration) domain.WalletUsecase {
+func NewWalletUsecase(rwr domain.RPCWalletRepository, swr domain.SupabaseWalletRepository, timeout time.Duration) domain.WalletUsecase {
 	return &WalletUsecase{
-		walletRepo:     wr,
+		rpcWalletRepo:  rwr,
+		supaWalletRepo: swr,
 		contextTimeout: timeout,
 	}
 }
@@ -28,7 +33,7 @@ func (w *WalletUsecase) Transfer(ctx context.Context, mnemonic string, toAddr st
 	toAddrHex := common.HexToAddress(toAddr)
 	amountBigInt := big.NewInt(int64(amount))
 
-	txHash, err := w.walletRepo.Transfer(ctx, mnemonic, toAddrHex, amountBigInt, nil, gasLimit)
+	txHash, err := w.rpcWalletRepo.Transfer(ctx, mnemonic, toAddrHex, amountBigInt, nil, gasLimit)
 	if err != nil {
 		return "", err
 	}
@@ -37,27 +42,29 @@ func (w *WalletUsecase) Transfer(ctx context.Context, mnemonic string, toAddr st
 }
 
 func (w *WalletUsecase) GetBalanceFromMnemonic(ctx context.Context, mnemonic string) (domain.Wallet, error) {
-	ctx, cancel := context.WithTimeout(ctx, w.contextTimeout)
-	defer cancel()
+	//ctx, cancel := context.WithTimeout(ctx, w.contextTimeout)
+	//defer cancel()
+	//
+	//bal, addr, err := w.rpcWalletRepo.GetBalanceFromMnemonic(ctx, mnemonic)
+	//if err != nil {
+	//	return domain.Wallet{}, err
+	//}
+	//
+	//wallet := domain.Wallet{
+	//	Address: addr,
+	//	Balance: bal,
+	//}
+	//
+	//return wallet, nil
 
-	bal, addr, err := w.walletRepo.GetBalanceFromMnemonic(ctx, mnemonic)
-	if err != nil {
-		return domain.Wallet{}, err
-	}
-
-	wallet := domain.Wallet{
-		Address: addr,
-		Balance: bal,
-	}
-
-	return wallet, nil
+	panic("implement me")
 }
 
 func (w *WalletUsecase) GenerateNewWallet(ctx context.Context) (domain.NewWallet, error) {
 	ctx, cancel := context.WithTimeout(ctx, w.contextTimeout)
 	defer cancel()
 
-	addr, mnemonic, err := w.walletRepo.GenerateNewWallet(ctx)
+	addr, mnemonic, err := w.rpcWalletRepo.GenerateNewWallet(ctx)
 	if err != nil {
 		return domain.NewWallet{}, err
 	}
@@ -71,19 +78,60 @@ func (w *WalletUsecase) GenerateNewWallet(ctx context.Context) (domain.NewWallet
 	return newWallet, nil
 }
 
-func (w *WalletUsecase) GetBalance(ctx context.Context, address string) (domain.Wallet, error) {
+func (w *WalletUsecase) GetBalance(ctx context.Context, tokenAddresses []string, address string) (domain.Wallet, error) {
 	ctx, cancel := context.WithTimeout(ctx, w.contextTimeout)
 	defer cancel()
 
-	balance, err := w.walletRepo.GetBalance(ctx, address)
+	tokens, err := w.supaWalletRepo.GetToken(ctx, tokenAddresses)
 	if err != nil {
 		return domain.Wallet{}, err
 	}
 
+	balanceChan := make(chan domain.TokenBalance, len(tokenAddresses))
+	var wg sync.WaitGroup
+
+	for _, token := range tokens {
+		wg.Add(1)
+		go func(token domain.Token) {
+			defer wg.Done()
+
+			balance, err := w.rpcWalletRepo.GetBalance(ctx, token.SmartContractAddress, address)
+			if err != nil {
+				log.Printf("Failed to get token balance for token %s: %v", token.Name, err)
+				return
+			}
+
+			decimal, err := strconv.Atoi(token.Decimal)
+			if err != nil {
+				log.Printf("Failed to convert decimal for token %s: %v", token.Name, err)
+				return
+			}
+
+			balanceChan <- domain.TokenBalance{
+				Name:    token.Name,
+				Amount:  balance,
+				Symbol:  token.Symbol,
+				LogoUrl: token.LogoUrl,
+				Decimal: decimal,
+			}
+		}(token)
+	}
+
+	go func() {
+		wg.Wait()
+		close(balanceChan)
+	}()
+
+	tokenBalance := []domain.TokenBalance{}
+	for balance := range balanceChan {
+		tokenBalance = append(tokenBalance, balance)
+	}
+
 	wallet := domain.Wallet{
-		Address: address,
-		Balance: balance,
+		Address:      address,
+		TokenBalance: tokenBalance,
 	}
 
 	return wallet, nil
+
 }
