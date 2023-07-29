@@ -20,37 +20,6 @@ func NewRPCWalletRepository(client *ethclient.Client) domain.RPCWalletRepository
 	return &RPCWalletRepository{client: client}
 }
 
-//func (r *RPCWalletRepository) GetBalance(ctx context.Context, s string, s2 string) (*big.Int, error) {
-//	//TODO implement me
-//	panic("implement me")
-//}
-
-//func (r *RPCWalletRepository) GetBalance(ctx context.Context, s string) (domain.Balances, error) {
-//	//TODO implement me
-//	panic("implement me")
-//}
-
-func (r *RPCWalletRepository) GetBalanceFromMnemonic(ctx context.Context, mnemonic string) ([]domain.Balances, string, error) {
-	//wallet, err := hdwallet.NewFromMnemonic(mnemonic)
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-	//
-	//path := hdwallet.MustParseDerivationPath("m/44'/60'/0'/0/0")
-	//account, err := wallet.Derive(path, false)
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-	//
-	//bal, err := r.GetBalance(ctx, account.Address.Hex())
-	//if err != nil {
-	//	return nil, "", err
-	//}
-	//
-	//return bal, account.Address.Hex(), nil
-	panic("implement me")
-}
-
 func (r *RPCWalletRepository) GenerateNewWallet(ctx context.Context) (string, string, error) {
 	mnemonic, err := hdwallet.NewMnemonic(256)
 	if err != nil {

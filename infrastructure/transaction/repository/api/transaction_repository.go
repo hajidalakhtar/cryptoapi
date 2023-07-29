@@ -24,7 +24,7 @@ func NewAPITransactionRepository(bscUrl string) domain.APITransactionRepository 
 }
 
 func (A APITransactionRepository) TransactionHistory(ctx context.Context, address string, sort string, page string, offset string) ([]domain.Transactions, error) {
-	apiKey := helper.RandomApiKey()
+	apiKey := helper.RandomBSCScanApiKey()
 	url := A.bscUrl + "?module=account&action=txlist&address=" + address + "&startblock=0&endblock=99999999&page=" + page + "&offset=" + offset + "&sort=asc&apikey=" + apiKey
 	response, err := http.Get(url)
 

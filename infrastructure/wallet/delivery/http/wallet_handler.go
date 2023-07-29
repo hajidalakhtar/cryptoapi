@@ -19,11 +19,14 @@ func NewWalletHandler(app *fiber.App, wu domain.WalletUsecase) {
 	app.Get("/generate/wallet", handler.GenerateNewWallet)
 	app.Post("/bal", handler.GetBalanceFromMnemonic)
 	app.Post("/transfer/:toaddr", handler.Transfer)
+	app.Post("/add/token", handler.AddToken)
 }
 
 func (wh *WalletHandler) GetBalanceFromMnemonic(c *fiber.Ctx) error {
 	mnemonic := c.FormValue("mnemonic")
-	data, err := wh.walletUsecase.GetBalanceFromMnemonic(c.Context(), mnemonic)
+	tokenAddr := c.Query("token")
+	tokenAddrArr := strings.Split(tokenAddr, ",")
+	data, err := wh.walletUsecase.GetBalanceFromMnemonic(c.Context(), tokenAddrArr, mnemonic)
 
 	if err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(domain.WebResponse{
@@ -102,4 +105,23 @@ func (wh *WalletHandler) Transfer(c *fiber.Ctx) error {
 		Data:    data,
 		Message: "SUCCESS",
 	})
+}
+
+func (wh *WalletHandler) AddToken(c *fiber.Ctx) error {
+	tokenAddr := c.FormValue("token")
+	_, err := wh.walletUsecase.AddToken(c.Context(), tokenAddr)
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(domain.WebResponse{
+			Status:  http.StatusInternalServerError,
+			Message: err.Error(),
+			Data:    nil,
+		})
+	}
+
+	return c.JSON(domain.WebResponse{
+		Status:  http.StatusOK,
+		Data:    "success",
+		Message: "Success",
+	})
+
 }
