@@ -40,7 +40,7 @@ func (r *RPCWalletRepository) GenerateNewWallet(ctx context.Context) (string, st
 	return account.Address.Hex(), mnemonic, nil
 }
 
-func (r *RPCWalletRepository) GetBalance(ctx context.Context, tokenAddr string, addr string) (*big.Float, error) {
+func (r *RPCWalletRepository) GetBalance(ctx context.Context, tokenAddr string, addr string, tokenABI string) (*big.Float, error) {
 
 	address := common.HexToAddress(addr)
 	if tokenAddr == "0xb8c77482e45f1f44de1745f52c74426c631bdd52" {
@@ -52,7 +52,7 @@ func (r *RPCWalletRepository) GetBalance(ctx context.Context, tokenAddr string, 
 		return nativeTokenBalance, nil
 	} //bnb
 
-	balance, err := helper.GetTokenBalance(r.client, addr, tokenAddr)
+	balance, err := helper.GetTokenBalance(r.client, addr, tokenAddr, tokenABI)
 	return balance, err
 
 }
@@ -83,7 +83,6 @@ func (r *RPCWalletRepository) Transfer(ctx context.Context, mnemonic string, toA
 	if err != nil {
 		log.Fatalf("Failed to get gas price: %v", err)
 	}
-
 	gasLimit = uint64(21000)
 	var data []byte
 

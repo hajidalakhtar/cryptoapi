@@ -4,7 +4,6 @@ import (
 	"context"
 	"cryptoapi/helper"
 	"fmt"
-	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/jackc/pgx/v5"
 	"log"
 	"os"
@@ -42,7 +41,10 @@ func main() {
 	}
 	defer conn.Close(context.Background())
 
-	client, err := ethclient.Dial("https://data-seed-prebsc-2-s1.bnbchain.org:8545")
+	client := helper.GetNetwork()
+	chainId, err := client.ChainID(context.Background())
+	fmt.Println("chain ID", chainId)
+	//client, err := ethclient.Dial("https://bsc-mainnet.public.blastapi.io")
 	defer client.Close()
 
 	bscscanApi := "https://api.bscscan.com/api"

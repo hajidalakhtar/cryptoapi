@@ -52,7 +52,7 @@ type WalletUsecase interface {
 	AddToken(context.Context, string) (Token, error)
 }
 type RPCWalletRepository interface {
-	GetBalance(context.Context, string, string) (*big.Float, error)
+	GetBalance(context.Context, string, string, string) (*big.Float, error)
 	GenerateNewWallet(context.Context) (string, string, error)
 	Transfer(context.Context, string, common.Address, *big.Int, *big.Int, uint64) (string, error)
 }

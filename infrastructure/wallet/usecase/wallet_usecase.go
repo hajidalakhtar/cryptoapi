@@ -95,7 +95,7 @@ func (w *WalletUsecase) GetBalanceFromMnemonic(ctx context.Context, tokenAddress
 		wg.Add(1)
 		go func(token domain.Token) {
 			defer wg.Done()
-			balance, err := w.rpcWalletRepo.GetBalance(ctx, token.SmartContractAddress, address)
+			balance, err := w.rpcWalletRepo.GetBalance(ctx, token.SmartContractAddress, address, token.TokenABI)
 			if err != nil {
 				log.Printf("Failed to get token balance for token %s: %v", token.Name, err)
 				return
@@ -168,7 +168,7 @@ func (w *WalletUsecase) GetBalance(ctx context.Context, tokenAddresses []string,
 		wg.Add(1)
 		go func(token domain.Token) {
 			defer wg.Done()
-			balance, err := w.rpcWalletRepo.GetBalance(ctx, token.SmartContractAddress, address)
+			balance, err := w.rpcWalletRepo.GetBalance(ctx, token.SmartContractAddress, address, token.TokenABI)
 			if err != nil {
 				log.Printf("Failed to get token balance for token %s: %v", token.Name, err)
 				return

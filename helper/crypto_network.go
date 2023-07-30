@@ -1,12 +1,13 @@
 package helper
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/rs/zerolog/log"
 	"io/ioutil"
-	"math/rand"
 	"os"
-	"time"
 )
 
 type Endpoint struct {
@@ -23,15 +24,31 @@ func init() {
 }
 
 // GetNetwork returns a random BSC testnet endpoint.
-func GetNetwork() string {
+func GetNetwork() *ethclient.Client {
 
 	testnet := getAvailableTestnetEndpoints()
+
 	if len(testnet) == 0 {
-		return ""
+		log.Warn().Msg("No available BSC testnet endpoints")
+		return &ethclient.Client{}
 	}
 
-	rand.Seed(time.Now().UnixNano())
-	return testnet[rand.Intn(len(testnet))].URL
+	for _, chain := range testnet {
+		client, err := ethclient.Dial(chain.URL)
+		chainId, err := client.ChainID(context.Background())
+		if err != nil || chainId == nil {
+			log.Warn().Err(err).Msg("Trying to connect to other endpoint")
+			MarkEndpointAsFailed(chain.URL)
+
+			continue
+		}
+		return client
+
+	}
+
+	log.Warn().Msg("No available BSC testnet endpoints")
+	return &ethclient.Client{}
+
 }
 
 // MarkEndpointAsFailed adds the given endpoint URL to the list of failed endpoints and saves the list to the file.
@@ -83,7 +100,6 @@ func loadChainsFromFile() {
 	}
 
 	err = json.Unmarshal(data, &chains)
-
 	if err != nil {
 		// Handle error (e.g., log or return an error)
 		return

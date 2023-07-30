@@ -1,8 +1,50 @@
 [
-
-
   {
-    "url": "https://api.zan.top/node/v1/bsc/testnet/public",
+    "url": "https://bsc-dataseed.binance.org",
+    "failed": false
+  },
+  {
+    "url": "https://bsc-dataseed1.defibit.io",
+    "failed": false
+  },
+  {
+    "url": "https://bsc-dataseed1.ninicoin.io",
+    "failed": false
+  },
+  {
+    "url": "https://bsc-dataseed2.defibit.io",
+    "failed": false
+  },
+  {
+    "url": "https://bsc-dataseed3.defibit.io",
+    "failed": false
+  },
+  {
+    "url": "https://bsc-dataseed4.defibit.io",
+    "failed": false
+  },
+  {
+    "url": "https://bsc-dataseed2.ninicoin.io",
+    "failed": false
+  },
+  {
+    "url": "https://bsc-dataseed3.ninicoin.io",
+    "failed": false
+  },
+  {
+    "url": "https://bsc-dataseed4.ninicoin.io",
+    "failed": false
+  },
+  {
+    "url": "https://bsc-dataseed1.binance.org",
+    "failed": false
+  },
+  {
+    "url": "https://bsc-dataseed2.binance.org",
+    "failed": false
+  },
+  {
+    "url": "https://bsc-dataseed3.binance.org",
     "failed": false
   }
 ]
